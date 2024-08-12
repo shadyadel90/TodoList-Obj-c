@@ -13,6 +13,7 @@
 		F2A5CE7B2C69E5D600F61162 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F2A5CE7A2C69E5D600F61162 /* Assets.xcassets */; };
 		F2A5CE7E2C69E5D600F61162 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = F2A5CE7D2C69E5D600F61162 /* Base */; };
 		F2A5CE812C69E5D600F61162 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F2A5CE802C69E5D600F61162 /* main.m */; };
+		F2CC932E2C6A5861004B5F7E /* Todo.m in Sources */ = {isa = PBXBuildFile; fileRef = F2CC932C2C6A5861004B5F7E /* Todo.m */; };
 		F2E673DD2C69ED8E00AB02A1 /* TodoVC.m in Sources */ = {isa = PBXBuildFile; fileRef = F2E673DC2C69ED8E00AB02A1 /* TodoVC.m */; };
 		F2E673E02C69ED9C00AB02A1 /* InProgressVC.m in Sources */ = {isa = PBXBuildFile; fileRef = F2E673DF2C69ED9C00AB02A1 /* InProgressVC.m */; };
 		F2E673E32C69EDA700AB02A1 /* DoneVC.m in Sources */ = {isa = PBXBuildFile; fileRef = F2E673E22C69EDA700AB02A1 /* DoneVC.m */; };
@@ -31,6 +32,8 @@
 		F2A5CE7D2C69E5D600F61162 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F2A5CE7F2C69E5D600F61162 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F2A5CE802C69E5D600F61162 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F2CC932C2C6A5861004B5F7E /* Todo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Todo.m; path = ../../../../TodoListApp/TodoListApp/Todo.m; sourceTree = "<group>"; };
+		F2CC932D2C6A5861004B5F7E /* Todo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Todo.h; path = ../../../../TodoListApp/TodoListApp/Todo.h; sourceTree = "<group>"; };
 		F2E673DB2C69ED8E00AB02A1 /* TodoVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TodoVC.h; sourceTree = "<group>"; };
 		F2E673DC2C69ED8E00AB02A1 /* TodoVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TodoVC.m; sourceTree = "<group>"; };
 		F2E673DE2C69ED9C00AB02A1 /* InProgressVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InProgressVC.h; sourceTree = "<group>"; };
@@ -92,6 +95,8 @@
 				F2A5CE7C2C69E5D600F61162 /* LaunchScreen.storyboard */,
 				F2A5CE7F2C69E5D600F61162 /* Info.plist */,
 				F2A5CE802C69E5D600F61162 /* main.m */,
+				F2CC932D2C6A5861004B5F7E /* Todo.h */,
+				F2CC932C2C6A5861004B5F7E /* Todo.m */,
 			);
 			path = TodoListApp;
 			sourceTree = "<group>";
@@ -173,6 +178,7 @@
 				F2A5CE812C69E5D600F61162 /* main.m in Sources */,
 				F2F7794A2C69FEBA003440F7 /* TabBarController.m in Sources */,
 				F2E673DD2C69ED8E00AB02A1 /* TodoVC.m in Sources */,
+				F2CC932E2C6A5861004B5F7E /* Todo.m in Sources */,
 				F2A5CE732C69E5D500F61162 /* SceneDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

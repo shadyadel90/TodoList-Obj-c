@@ -17,12 +17,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.tabBarController.navigationItem.title = @"In Progress Todo's";
+ 
     _inProgressDisplayArray = [NSMutableArray new];
     
     if (_inProgressDisplayArray.count == 0) {
         _tableView.hidden = true;
     }
+}
+- (void)viewWillAppear:(BOOL)animated {
+    self.tabBarController.navigationItem.title = @"In Progress Todo's";
 }
 
 

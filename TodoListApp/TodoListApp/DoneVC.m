@@ -18,21 +18,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.tabBarController.navigationItem.title = @"Done Todo's";
+    
     _doneDisplayArray = [NSMutableArray new];
     
     if (_doneDisplayArray.count == 0) {
         _tableView.hidden = true;
     }}
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)viewWillAppear:(BOOL)animated {
+    self.tabBarController.navigationItem.title = @"Done Todo's";
 }
-*/
 
 @end

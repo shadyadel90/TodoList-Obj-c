@@ -71,8 +71,9 @@
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="nothing" translatesAutoresizingMaskIntoConstraints="NO" id="Or7-YX-Ok3">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="769"/>
                             </imageView>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="91A-4F-1rw">
-                                <rect key="frame" x="0.0" y="138" width="393" height="631"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="91A-4F-1rw">
+                                <rect key="frame" x="0.0" y="173" width="393" height="596"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" id="wbk-h5-dI9">
@@ -99,11 +100,7 @@
                         <constraints>
                             <constraint firstItem="Or7-YX-Ok3" firstAttribute="top" secondItem="vyo-I2-MJ9" secondAttribute="top" id="AGo-1w-LCy"/>
                             <constraint firstItem="vyo-I2-MJ9" firstAttribute="bottom" secondItem="Or7-YX-Ok3" secondAttribute="bottom" id="Ahp-SI-pdf"/>
-                            <constraint firstItem="91A-4F-1rw" firstAttribute="top" secondItem="vyo-I2-MJ9" secondAttribute="top" id="HXl-nZ-Jon"/>
-                            <constraint firstItem="vyo-I2-MJ9" firstAttribute="bottom" secondItem="91A-4F-1rw" secondAttribute="bottom" id="RfG-v4-bfT"/>
-                            <constraint firstItem="91A-4F-1rw" firstAttribute="leading" secondItem="vyo-I2-MJ9" secondAttribute="leading" id="cfB-oP-n5t"/>
                             <constraint firstItem="vyo-I2-MJ9" firstAttribute="trailing" secondItem="Or7-YX-Ok3" secondAttribute="trailing" id="eZk-ys-BsJ"/>
-                            <constraint firstItem="vyo-I2-MJ9" firstAttribute="trailing" secondItem="91A-4F-1rw" secondAttribute="trailing" id="kYT-ev-3ja"/>
                             <constraint firstItem="Or7-YX-Ok3" firstAttribute="leading" secondItem="vyo-I2-MJ9" secondAttribute="leading" id="suD-Fz-I96"/>
                         </constraints>
                     </view>
@@ -225,7 +222,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="images3" translatesAutoresizingMaskIntoConstraints="NO" id="03a-it-R1g">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="images3" translatesAutoresizingMaskIntoConstraints="NO" id="03a-it-R1g">
                                 <rect key="frame" x="76" y="124" width="240" height="128"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
@@ -268,9 +265,12 @@
                                 <rect key="frame" x="51" y="727" width="290" height="39"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Edit">
+                                <buttonConfiguration key="configuration" style="filled" title="Save">
                                     <color key="baseBackgroundColor" systemColor="systemIndigoColor"/>
                                 </buttonConfiguration>
+                                <connections>
+                                    <action selector="btnEdit_SaveButtonClicked:" destination="Zaj-48-h7O" eventType="touchUpInside" id="g9w-2f-q9E"/>
+                                </connections>
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="XcD-om-vRl">
                                 <rect key="frame" x="137" y="342" width="240" height="128"/>
@@ -312,6 +312,15 @@
                         <viewLayoutGuide key="safeArea" id="7L9-ml-KMu"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <connections>
+                        <outlet property="btnEdit_SaveButton" destination="7gK-ua-KAH" id="ewt-4v-Jt3"/>
+                        <outlet property="imgTodoImage" destination="03a-it-R1g" id="ycX-cu-Wpb"/>
+                        <outlet property="pickTodoDate" destination="Lwp-Wu-irQ" id="iyE-xR-RP4"/>
+                        <outlet property="segTodoPriorty" destination="kcL-2d-x1d" id="ksG-Kn-qLV"/>
+                        <outlet property="segTodoType" destination="0Yn-ya-aVJ" id="WH5-Cz-uEg"/>
+                        <outlet property="txfTodoTitle" destination="jG6-Be-Pvx" id="hm0-Jk-e5A"/>
+                        <outlet property="txvTodoDescription" destination="XcD-om-vRl" id="Ovh-WJ-pPD"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x6r-XB-GNg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
