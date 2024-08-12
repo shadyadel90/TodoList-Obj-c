@@ -86,7 +86,7 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <searchBar contentMode="redraw" id="Kg9-8g-2ye">
+                            <searchBar contentMode="redraw" placeholder="Search!" id="Kg9-8g-2ye">
                                 <rect key="frame" x="0.0" y="103" width="393" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <textInputTraits key="textInputTraits"/>
@@ -106,6 +106,7 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Todo" image="note.text.badge.plus" catalog="system" id="BZG-8R-ysa"/>
                     <connections>
+                        <outlet property="searchBar" destination="Kg9-8g-2ye" id="jwI-Ke-BKT"/>
                         <outlet property="tableView" destination="91A-4F-1rw" id="gJy-mV-YV5"/>
                     </connections>
                 </viewController>
@@ -140,7 +141,7 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <searchBar contentMode="redraw" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8VB-47-hAj">
+                            <searchBar contentMode="redraw" fixedFrame="YES" placeholder="Search!" translatesAutoresizingMaskIntoConstraints="NO" id="8VB-47-hAj">
                                 <rect key="frame" x="0.0" y="111" width="393" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <textInputTraits key="textInputTraits"/>
@@ -154,6 +155,7 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Done" image="checkmark.seal.fill" catalog="system" id="mSv-Wh-OnL"/>
                     <connections>
+                        <outlet property="searchBar" destination="8VB-47-hAj" id="elf-PZ-lEi"/>
                         <outlet property="tableView" destination="Hee-hb-jxq" id="xJn-Cp-T4s"/>
                     </connections>
                 </viewController>
@@ -187,7 +189,7 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <searchBar contentMode="redraw" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nQP-Lp-n5k">
+                            <searchBar contentMode="redraw" fixedFrame="YES" placeholder="Search!" translatesAutoresizingMaskIntoConstraints="NO" id="nQP-Lp-n5k">
                                 <rect key="frame" x="0.0" y="102" width="393" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <textInputTraits key="textInputTraits"/>
@@ -208,6 +210,7 @@
                     <tabBarItem key="tabBarItem" title="In Progress" image="pencil.and.list.clipboard" catalog="system" id="CDP-EC-dAa"/>
                     <connections>
                         <outlet property="inProgressTableView" destination="wlv-F8-E1e" id="63L-mf-NLb"/>
+                        <outlet property="searchBar" destination="nQP-Lp-n5k" id="4ZE-7c-4Nh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KKV-pe-bMG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

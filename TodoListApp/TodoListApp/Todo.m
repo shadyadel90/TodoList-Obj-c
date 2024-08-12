@@ -32,4 +32,15 @@
     }
     return self;
 }
+
+- (BOOL)isEqual:(id)object {
+    if (self == object) return YES;
+    if (![object isKindOfClass:[Todo class]]) return NO;
+    Todo *otherTask = (Todo *)object;
+    return [self.name isEqualToString:otherTask.name] && [self.date isEqualToDate:otherTask.date];
+}
+
+- (NSUInteger)hash {
+    return [self.name hash] ^ [self.date hash];
+}
 @end

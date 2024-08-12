@@ -45,7 +45,7 @@
         } else {
             self.imgTodoImage.image = [UIImage systemImageNamed:@"done"];
         }
-
+        
         
         self.txfTodoTitle.text = self.taskToEdit.name;
         self.txvTodoDescription.text = self.taskToEdit.descrption;
@@ -53,6 +53,7 @@
         self.segTodoType.selectedSegmentIndex = [_status indexOfObject:self.taskToEdit.status];
         self.pickTodoDate.date = self.taskToEdit.date;
         
+       // [self updateSegmentControlForStatus:self.taskToEdit.status];
         
         [self.btnEdit_SaveButton setTitle:@"Edit" forState:UIControlStateNormal];
     }
@@ -69,6 +70,19 @@
         [self showAlertWithTitle:@"Missing Information" andMessage:@"Please enter a task description."];
         return;
     }
+    NSString *selectedStatus = _status[_segTodoType.selectedSegmentIndex];
+    NSString *currentStatus = self.taskToEdit ? self.taskToEdit.status : @"todo";
+    
+    if ([currentStatus isEqualToString:@"inprogress"] && [selectedStatus isEqualToString:@"todo"]) {
+        [self showAlertWithTitle:@"Invalid Transition" andMessage:@"You cannot move a task from 'In Progress' back to 'To Do'."];
+        return;
+    }
+    
+    if ([currentStatus isEqualToString:@"done"] && [selectedStatus isEqualToString:@"inprogress"]) {
+        [self showAlertWithTitle:@"Invalid Transition" andMessage:@"You cannot move a task from 'Done' back to 'In Progress'."];
+        return;
+    }
+    
     
     
     UIAlertController *confirmAlert = [UIAlertController alertControllerWithTitle:@"Confirm Save"
@@ -101,43 +115,63 @@
 
 
 - (void)saveTask {
-    Todo* task = [Todo new];
+    Todo *task = [Todo new];
     task.name = _txfTodoTitle.text;
     task.descrption = _txvTodoDescription.text;
     task.priority = _types[_segTodoPriorty.selectedSegmentIndex];
     task.status = _status[_segTodoType.selectedSegmentIndex];
     task.date = _pickTodoDate.date;
     
-    [_tasksArray addObject:task];
+    BOOL taskUpdated = NO;
+    for (NSInteger i = 0; i < _tasksArray.count; i++) {
+        Todo *existingTask = _tasksArray[i];
+        if ([existingTask isEqual:task]) {
+            _tasksArray[i] = task;
+            taskUpdated = YES;
+            break;
+        }
+    }
+    
+    if (!taskUpdated) {
+        [_tasksArray addObject:task];
+    }
+    
     NSError *error;
-    NSData* archiveData = [NSKeyedArchiver archivedDataWithRootObject:_tasksArray requiringSecureCoding:YES error:&error];
+    NSData *archiveData = [NSKeyedArchiver archivedDataWithRootObject:_tasksArray requiringSecureCoding:YES error:&error];
     if (error) {
         NSLog(@"Error archiving tasks: %@", error.localizedDescription);
         return;
     }
     
     [_defaults setObject:archiveData forKey:@"tasks"];
+    [_defaults synchronize];
+
 }
 
 
 -(void)loadTasks {
-    NSError *error;
-    NSData *savedData = [_defaults objectForKey:@"tasks"];
-    if (savedData) {
-        NSSet *set = [NSSet setWithObjects:[NSArray class], [Todo class], nil];
-        _tasksArray = [NSKeyedUnarchiver unarchivedObjectOfClasses:set fromData:savedData error:&error];
-        if (error) {
-            NSLog(@"Error unarchiving tasks: %@", error.localizedDescription);
-            return;
+    [_tasksArray removeAllObjects];
+        NSError *error;
+        NSData *savedData = [_defaults objectForKey:@"tasks"];
+        if (savedData) {
+            NSSet *set = [NSSet setWithObjects:[NSArray class], [Todo class], nil];
+            _tasksArray = [NSKeyedUnarchiver unarchivedObjectOfClasses:set fromData:savedData error:&error];
+            if (error) {
+                NSLog(@"Error unarchiving tasks: %@", error.localizedDescription);
+                return;
+            }
         }
-        
-//        for (Todo *task in _tasksArray) {
-//            NSLog(@"Task name: %@", task.name);
-//            NSLog(@"Task description: %@", task.descrption);
-//            NSLog(@"Task priority: %@", task.priority);
-//            NSLog(@"Task status: %@", task.status);
-//            NSLog(@"Task date: %@", task.date);
-//        }
+}
+
+- (void)updateSegmentControlForStatus:(NSString *)status {
+    if ([status isEqualToString:@"todo"]) {
+        self.segTodoType.enabled = YES;
+    } else if ([status isEqualToString:@"inprogress"]) {
+        self.segTodoType.enabled = NO;
+    } else if ([status isEqualToString:@"done"]) {
+        self.segTodoType.enabled = NO;
+    } else {
+        self.segTodoType.enabled = YES;
     }
 }
 @end
