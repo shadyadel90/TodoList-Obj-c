@@ -131,13 +131,13 @@
             return;
         }
         
-        for (Todo *task in _tasksArray) {
-            NSLog(@"Task name: %@", task.name);
-            NSLog(@"Task description: %@", task.descrption);
-            NSLog(@"Task priority: %@", task.priority);
-            NSLog(@"Task status: %@", task.status);
-            NSLog(@"Task date: %@", task.date);
-        }
+//        for (Todo *task in _tasksArray) {
+//            NSLog(@"Task name: %@", task.name);
+//            NSLog(@"Task description: %@", task.descrption);
+//            NSLog(@"Task priority: %@", task.priority);
+//            NSLog(@"Task status: %@", task.status);
+//            NSLog(@"Task date: %@", task.date);
+//        }
     }
 }
 @end
