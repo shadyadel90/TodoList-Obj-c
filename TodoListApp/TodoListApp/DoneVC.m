@@ -29,13 +29,14 @@
     self.doneTableView.dataSource = self;
     self.doneTableView.delegate = self;
     
-    [self updateTableViewVisibility];
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     self.tabBarController.navigationItem.title = @"Done Todo's";
     [self loadSavedTasks];
+    [self updateTableViewVisibility];
     [self.doneTableView reloadData];
 }
 
@@ -128,7 +129,7 @@
         
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         
-        [self saveTasks];
+       // [self saveTasks];
     }
 }
 

@@ -17,6 +17,7 @@
 @property NSUserDefaults *defaults;
 @property NSMutableArray<Todo*> *filteredTodoArray;
 @property BOOL isSearching;
+@property NSMutableArray<Todo*> *tasksArray;
 
 @end
 
@@ -35,7 +36,7 @@
     self.inProgressTableView.dataSource = self;
     self.inProgressTableView.delegate = self;
     
-    [self updateTableViewVisibility];
+    
 }
 
 - (void)updateTableViewVisibility {
@@ -51,27 +52,8 @@
     [super viewWillAppear:animated];
     self.tabBarController.navigationItem.title = @"In Progress Todo's";
     [self loadSavedTasks];
+    [self updateTableViewVisibility];
     [self.inProgressTableView reloadData];
-}
-
-- (void)loadSavedTasks {
-    NSData *savedData = [_defaults objectForKey:@"tasks"];
-    if (savedData) {
-        NSError *error;
-        NSSet *set = [NSSet setWithObjects:[NSArray class], [Todo class], nil];
-        NSArray<Todo*> *tasksArray = [NSKeyedUnarchiver unarchivedObjectOfClasses:set fromData:savedData error:&error];
-        if (error) {
-            NSLog(@"Error unarchiving tasks: %@", error.localizedDescription);
-            return;
-        }
-        [_inProgressDisplayArray removeAllObjects];
-        
-        for (Todo *task in tasksArray) {
-            if ([task.status isEqualToString:@"inprogress"]) {
-                [_inProgressDisplayArray addObject:task];
-            }
-        }
-    }
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -86,7 +68,6 @@
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"priority == %@", [self priorityStringForSection:section]];
     return _isSearching ? [_filteredTodoArray filteredArrayUsingPredicate:predicate] : [_inProgressDisplayArray filteredArrayUsingPredicate:predicate];
 }
-
 - (NSString *)priorityStringForSection:(NSInteger)section {
     if (section == 0) return @"high";
     if (section == 1) return @"medium";
@@ -136,19 +117,25 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        Todo *taskToDelete = _isSearching ? _filteredTodoArray[indexPath.row] : [self tasksForSection:indexPath.section][indexPath.row];
-        [_inProgressDisplayArray removeObject:taskToDelete];
-        [_filteredTodoArray removeObject:taskToDelete];
-        
+        Todo *taskToDelete;
+        if (_isSearching) {
+            taskToDelete = _filteredTodoArray[indexPath.row];
+           
+            [_tasksArray removeObject:taskToDelete];
+        } else {
+            taskToDelete = [self tasksForSection:indexPath.section][indexPath.row];
+           
+            [_tasksArray removeObject:taskToDelete];
+        }
+
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        
-        [self saveTasks];
+        //[self saveTasks];
     }
 }
 
 - (void)saveTasks {
     NSError *error;
-    NSData *archiveData = [NSKeyedArchiver archivedDataWithRootObject:_inProgressDisplayArray requiringSecureCoding:YES error:&error];
+    NSData *archiveData = [NSKeyedArchiver archivedDataWithRootObject:_tasksArray requiringSecureCoding:YES error:&error];
     if (error) {
         NSLog(@"Error archiving tasks: %@", error.localizedDescription);
         return;
@@ -170,5 +157,24 @@
     NSArray<Todo*> *filtered = [_inProgressDisplayArray filteredArrayUsingPredicate:predicate];
     [_filteredTodoArray addObjectsFromArray:filtered];
 }
+- (void)loadSavedTasks {
+    NSData *savedData = [_defaults objectForKey:@"tasks"];
+    if (savedData) {
+        NSError *error;
+        NSSet *set = [NSSet setWithObjects:[NSArray class], [Todo class], nil];
+        _tasksArray = [NSKeyedUnarchiver unarchivedObjectOfClasses:set fromData:savedData error:&error];
+        if (error) {
+            NSLog(@"Error unarchiving tasks: %@", error.localizedDescription);
+            return;
+        }
+        [_inProgressDisplayArray removeAllObjects];
 
+        for (Todo *task in _tasksArray) {
+            if ([task.status isEqualToString:@"inprogress"]) {
+                [_inProgressDisplayArray addObject:task];
+            }
+        }
+        [self.inProgressTableView reloadData];
+    }
+}
 @end

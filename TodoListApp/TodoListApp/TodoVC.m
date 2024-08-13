@@ -34,11 +34,8 @@
     self.searchBar.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    }
     
-    
-    [self updateTableViewVisibility];
-}
-
 - (void)updateTableViewVisibility {
     if ((_isSearching && _filteredTodoArray.count == 0) || (!_isSearching && _todoDisplayArray.count == 0)) {
         _tableView.hidden = YES;
@@ -53,6 +50,7 @@
     self.tabBarController.navigationItem.title = @"Todo's";
     
     [self loadSavedTasks];
+    [self updateTableViewVisibility];
     [self.tableView reloadData];
 }
 
@@ -142,13 +140,20 @@
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSArray<Todo*> *tasksInSection = [self tasksForSection:indexPath.section];
         Todo *taskToDelete = tasksInSection[indexPath.row];
+        
+       
         [_todoDisplayArray removeObject:taskToDelete];
         [_filteredTodoArray removeObject:taskToDelete];
         
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+
+        [self.tableView beginUpdates];
+        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableView endUpdates];
+        
         
         [self saveTask];
     }
+    [self updateTableViewVisibility];
 }
 
 - (void)saveTask {

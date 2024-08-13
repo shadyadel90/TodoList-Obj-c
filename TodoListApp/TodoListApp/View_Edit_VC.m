@@ -41,10 +41,11 @@
         if ([self.taskToEdit.status isEqualToString:@"todo"]) {
             self.imgTodoImage.image = [UIImage imageNamed:@"todo"];
         } else if ([self.taskToEdit.status isEqualToString:@"inprogress"]) {
-            self.imgTodoImage.image = [UIImage systemImageNamed:@"inprogress"];
+            self.imgTodoImage.image = [UIImage systemImageNamed:@"hourglass.tophalf.filled"];
         } else {
-            self.imgTodoImage.image = [UIImage systemImageNamed:@"done"];
+            self.imgTodoImage.image = [UIImage systemImageNamed:@"checkmark.gobackward"];
         }
+        
         
         
         self.txfTodoTitle.text = self.taskToEdit.name;
