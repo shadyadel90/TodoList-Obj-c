@@ -9,14 +9,15 @@
 #import "Todo.h"
 #import "View_Edit_VC.h"
 
-@interface InProgressVC () <UITableViewDataSource, UITableViewDelegate,UISearchBarDelegate>
-@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
+@interface InProgressVC () <UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
 
+@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
 @property (nonatomic) IBOutlet UITableView *inProgressTableView;
-@property NSMutableArray* inProgressDisplayArray;
+@property NSMutableArray<Todo*> *inProgressDisplayArray;
 @property NSUserDefaults *defaults;
 @property NSMutableArray<Todo*> *filteredTodoArray;
 @property BOOL isSearching;
+
 @end
 
 @implementation InProgressVC
@@ -24,23 +25,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _inProgressDisplayArray = [NSMutableArray new];
+    _inProgressDisplayArray = [NSMutableArray<Todo*> new];
     _defaults = [NSUserDefaults standardUserDefaults];
     _filteredTodoArray = [NSMutableArray<Todo*> new];
     _isSearching = NO;
     [self loadSavedTasks];
     
-    self.inProgressTableView.delegate = self;
-    self.inProgressTableView.dataSource = self;
     self.searchBar.delegate = self;
-    if (_inProgressDisplayArray.count == 0) {
-        _inProgressTableView.hidden = true;
-    } else {
-        _inProgressTableView.hidden = false;
-        [self.inProgressTableView reloadData];
-    }
-    [self updateTableViewVisibility];
+    self.inProgressTableView.dataSource = self;
+    self.inProgressTableView.delegate = self;
     
+    [self updateTableViewVisibility];
 }
 
 - (void)updateTableViewVisibility {
@@ -52,15 +47,12 @@
     }
 }
 
-
-
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     self.tabBarController.navigationItem.title = @"In Progress Todo's";
     [self loadSavedTasks];
     [self.inProgressTableView reloadData];
 }
-
 
 - (void)loadSavedTasks {
     NSData *savedData = [_defaults objectForKey:@"tasks"];
@@ -74,33 +66,52 @@
         }
         [_inProgressDisplayArray removeAllObjects];
         
-        for (Todo* task in tasksArray) {
-            if ([task.status  isEqual: @"inprogress"]){
+        for (Todo *task in tasksArray) {
+            if ([task.status isEqualToString:@"inprogress"]) {
                 [_inProgressDisplayArray addObject:task];
             }
         }
-        
     }
 }
 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 3;
+}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (_isSearching) {
-        return _filteredTodoArray.count;
-    } else {
-        return _inProgressDisplayArray.count;
-    }
+    return _isSearching ? _filteredTodoArray.count : [self tasksForSection:section].count;
 }
+
+- (NSArray<Todo*> *)tasksForSection:(NSInteger)section {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"priority == %@", [self priorityStringForSection:section]];
+    return _isSearching ? [_filteredTodoArray filteredArrayUsingPredicate:predicate] : [_inProgressDisplayArray filteredArrayUsingPredicate:predicate];
+}
+
+- (NSString *)priorityStringForSection:(NSInteger)section {
+    if (section == 0) return @"high";
+    if (section == 1) return @"medium";
+    return @"low";
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    NSString *title;
+    if (section == 0) {
+        title = @"High Priority";
+    } else if (section == 1) {
+        title = @"Medium Priority";
+    } else {
+        title = @"Low Priority";
+    }
+    return title;
+}
+
+
+
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
     
-    Todo *task;
-    if (_isSearching) {
-        task = _filteredTodoArray[indexPath.row];
-    } else {
-        task = _inProgressDisplayArray[indexPath.row];
-    }
+    Todo *task = _isSearching ? _filteredTodoArray[indexPath.row] : [self tasksForSection:indexPath.section][indexPath.row];
     
     cell.textLabel.text = task.name;
     
@@ -116,29 +127,26 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    Todo *selectedTask;
-    if (_isSearching) {
-        selectedTask = _filteredTodoArray[indexPath.row];
-    } else {
-        selectedTask = _inProgressDisplayArray[indexPath.row];
-    }
+    Todo *selectedTask = _isSearching ? _filteredTodoArray[indexPath.row] : [self tasksForSection:indexPath.section][indexPath.row];
+    
     View_Edit_VC *editVC = [self.storyboard instantiateViewControllerWithIdentifier:@"View_Edit_VC"];
     editVC.taskToEdit = selectedTask;
     [self.navigationController pushViewController:editVC animated:YES];
 }
 
-
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [_inProgressDisplayArray removeObjectAtIndex:indexPath.row];
-
+        Todo *taskToDelete = _isSearching ? _filteredTodoArray[indexPath.row] : [self tasksForSection:indexPath.section][indexPath.row];
+        [_inProgressDisplayArray removeObject:taskToDelete];
+        [_filteredTodoArray removeObject:taskToDelete];
+        
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         
-       // [self saveTask];
+        [self saveTasks];
     }
 }
-- (void)saveTask {
-    
+
+- (void)saveTasks {
     NSError *error;
     NSData *archiveData = [NSKeyedArchiver archivedDataWithRootObject:_inProgressDisplayArray requiringSecureCoding:YES error:&error];
     if (error) {
@@ -148,16 +156,11 @@
     
     [_defaults setObject:archiveData forKey:@"tasks"];
     [_defaults synchronize];
-
 }
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
-    if (searchText.length == 0) {
-        _isSearching = NO;
-    } else {
-        _isSearching = YES;
-        [self filterTasksForSearchText:searchText];
-    }
+    _isSearching = searchText.length > 0;
+    [self filterTasksForSearchText:searchText];
     [self updateTableViewVisibility];
 }
 
@@ -167,4 +170,5 @@
     NSArray<Todo*> *filtered = [_inProgressDisplayArray filteredArrayUsingPredicate:predicate];
     [_filteredTodoArray addObjectsFromArray:filtered];
 }
+
 @end

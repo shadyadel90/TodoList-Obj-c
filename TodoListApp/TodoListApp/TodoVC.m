@@ -9,7 +9,7 @@
 #import "Todo.h"
 #import "View_Edit_VC.h"
 
-@interface TodoVC () <UITableViewDataSource, UITableViewDelegate,UISearchBarDelegate>
+@interface TodoVC () <UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
 
 @property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -37,7 +37,6 @@
     
     
     [self updateTableViewVisibility];
-    
 }
 
 - (void)updateTableViewVisibility {
@@ -72,24 +71,49 @@
     }
 }
 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 3;
+}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (_isSearching) {
-        return _filteredTodoArray.count;
+    NSArray<Todo*> *tasksInSection = [self tasksForSection:section];
+    return tasksInSection.count;
+}
+
+- (NSArray<Todo*> *)tasksForSection:(NSInteger)section {
+    NSPredicate *predicate;
+    if (section == 0) {
+        predicate = [NSPredicate predicateWithFormat:@"priority == %@", @"high"];
+    } else if (section == 1) {
+        predicate = [NSPredicate predicateWithFormat:@"priority == %@", @"medium"];
     } else {
-        return _todoDisplayArray.count;
+        predicate = [NSPredicate predicateWithFormat:@"priority == %@", @"low"];
+    }
+    if (_isSearching) {
+        return [_filteredTodoArray filteredArrayUsingPredicate:predicate];
+    } else {
+        return [_todoDisplayArray filteredArrayUsingPredicate:predicate];
+    }
+}
+
+
+
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if (section == 0) {
+        return @"High Priority";
+    } else if (section == 1) {
+        return @"Medium Priority";
+    } else {
+        return @"Low Priority";
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
     
-    Todo *task;
-    if (_isSearching) {
-        task = _filteredTodoArray[indexPath.row];
-    } else {
-        task = _todoDisplayArray[indexPath.row];
-    }
+    NSArray<Todo*> *tasksInSection = [self tasksForSection:indexPath.section];
+    Todo *task = tasksInSection[indexPath.row];
     
     cell.textLabel.text = task.name;
     
@@ -106,28 +130,28 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     Todo *selectedTask;
-    if (_isSearching) {
-        selectedTask = _filteredTodoArray[indexPath.row];
-    } else {
-        selectedTask = _todoDisplayArray[indexPath.row];
-    }
+    NSArray<Todo*> *tasksInSection = [self tasksForSection:indexPath.section];
+    selectedTask = tasksInSection[indexPath.row];
+    
     View_Edit_VC *editVC = [self.storyboard instantiateViewControllerWithIdentifier:@"View_Edit_VC"];
     editVC.taskToEdit = selectedTask;
     [self.navigationController pushViewController:editVC animated:YES];
 }
 
-
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [_todoDisplayArray removeObjectAtIndex:indexPath.row];
+        NSArray<Todo*> *tasksInSection = [self tasksForSection:indexPath.section];
+        Todo *taskToDelete = tasksInSection[indexPath.row];
+        [_todoDisplayArray removeObject:taskToDelete];
+        [_filteredTodoArray removeObject:taskToDelete];
         
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         
         [self saveTask];
     }
 }
+
 - (void)saveTask {
-    
     NSError *error;
     NSData *archiveData = [NSKeyedArchiver archivedDataWithRootObject:_todoDisplayArray requiringSecureCoding:YES error:&error];
     if (error) {
@@ -137,7 +161,6 @@
     
     [_defaults setObject:archiveData forKey:@"tasks"];
     [_defaults synchronize];
-    
 }
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
@@ -147,6 +170,7 @@
         _isSearching = YES;
         [self filterTasksForSearchText:searchText];
     }
+    [self.tableView reloadData];
     [self updateTableViewVisibility];
 }
 

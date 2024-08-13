@@ -1,22 +1,17 @@
-//
-//  DoneVC.m
-//  TodoListApp
-//
-//  Created by Shady Adel on 12/08/2024.
-//
-
+// DoneVC.m
 #import "DoneVC.h"
 #import "Todo.h"
 #import "View_Edit_VC.h"
 
-@interface DoneVC ()<UITableViewDataSource, UITableViewDelegate,UISearchBarDelegate>
-@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
+@interface DoneVC () <UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
 
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property NSMutableArray* doneDisplayArray;
-@property NSUserDefaults *defaults;
-@property NSMutableArray<Todo*> *filteredTodoArray;
-@property BOOL isSearching;
+@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
+@property (nonatomic) IBOutlet UITableView *doneTableView;
+@property (strong, nonatomic) NSMutableArray<Todo*> *doneDisplayArray;
+@property (strong, nonatomic) NSUserDefaults *defaults;
+@property (strong, nonatomic) NSMutableArray<Todo*> *filteredTodoArray;
+@property (assign, nonatomic) BOOL isSearching;
+
 @end
 
 @implementation DoneVC
@@ -24,44 +19,37 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _doneDisplayArray = [NSMutableArray new];
-    _defaults = [NSUserDefaults standardUserDefaults];
-    _filteredTodoArray = [NSMutableArray<Todo*> new];
-    _isSearching = NO;
+    self.doneDisplayArray = [NSMutableArray new];
+    self.defaults = [NSUserDefaults standardUserDefaults];
+    self.filteredTodoArray = [NSMutableArray new];
+    self.isSearching = NO;
+    
     [self loadSavedTasks];
     self.searchBar.delegate = self;
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
+    self.doneTableView.dataSource = self;
+    self.doneTableView.delegate = self;
     
-    if (_doneDisplayArray.count == 0) {
-        _tableView.hidden = true;
-    } else {
-        _tableView.hidden = false;
-        [self.tableView reloadData];
-    }
-    
-    if (_doneDisplayArray.count == 0) {
-        _tableView.hidden = true;
-    }}
+    [self updateTableViewVisibility];
+}
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     self.tabBarController.navigationItem.title = @"Done Todo's";
     [self loadSavedTasks];
-    [self.tableView reloadData];
+    [self.doneTableView reloadData];
 }
 
 - (void)updateTableViewVisibility {
-    if ((_isSearching && _filteredTodoArray.count == 0) || (!_isSearching && _doneDisplayArray.count == 0)) {
-        _tableView.hidden = YES;
-    } else {
-        _tableView.hidden = NO;
-        [self.tableView reloadData];
+    BOOL shouldHideTableView = (self.isSearching && self.filteredTodoArray.count == 0) || (!self.isSearching && self.doneDisplayArray.count == 0);
+    self.doneTableView.hidden = shouldHideTableView;
+    
+    if (!shouldHideTableView) {
+        [self.doneTableView reloadData];
     }
 }
 
 - (void)loadSavedTasks {
-    NSData *savedData = [_defaults objectForKey:@"tasks"];
+    NSData *savedData = [self.defaults objectForKey:@"tasks"];
     if (savedData) {
         NSError *error;
         NSSet *set = [NSSet setWithObjects:[NSArray class], [Todo class], nil];
@@ -70,35 +58,46 @@
             NSLog(@"Error unarchiving tasks: %@", error.localizedDescription);
             return;
         }
-        [_doneDisplayArray removeAllObjects];
+        [self.doneDisplayArray removeAllObjects];
         
-        for (Todo* task in tasksArray) {
-            if ([task.status  isEqual: @"done"]){
-                [_doneDisplayArray addObject:task];
+        for (Todo *task in tasksArray) {
+            if ([task.status isEqualToString:@"done"]) {
+                [self.doneDisplayArray addObject:task];
             }
         }
-        
     }
 }
 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 3;
+}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (_isSearching) {
-        return _filteredTodoArray.count;
-    } else {
-        return _doneDisplayArray.count;
-    }
+    return self.isSearching ? self.filteredTodoArray.count : [self tasksForSection:section].count;
+}
+
+- (NSArray<Todo*> *)tasksForSection:(NSInteger)section {
+    NSString *priority = [self priorityStringForSection:section];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"priority == %@", priority];
+    return self.isSearching ? [self.filteredTodoArray filteredArrayUsingPredicate:predicate] : [self.doneDisplayArray filteredArrayUsingPredicate:predicate];
+}
+
+- (NSString *)priorityStringForSection:(NSInteger)section {
+    if (section == 0) return @"high";
+    if (section == 1) return @"medium";
+    return @"low";
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if (section == 0) return @"High Priority";
+    if (section == 1) return @"Medium Priority";
+    return @"Low Priority";
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
     
-    Todo *task;
-    if (_isSearching) {
-        task = _filteredTodoArray[indexPath.row];
-    } else {
-        task = _doneDisplayArray[indexPath.row];
-    }
+    Todo *task = self.isSearching ? self.filteredTodoArray[indexPath.row] : [self tasksForSection:indexPath.section][indexPath.row];
     
     cell.textLabel.text = task.name;
     
@@ -114,55 +113,48 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    Todo *selectedTask;
-    if (_isSearching) {
-        selectedTask = _filteredTodoArray[indexPath.row];
-    } else {
-        selectedTask = _doneDisplayArray[indexPath.row];
-    }
+    Todo *selectedTask = self.isSearching ? self.filteredTodoArray[indexPath.row] : [self tasksForSection:indexPath.section][indexPath.row];
+    
     View_Edit_VC *editVC = [self.storyboard instantiateViewControllerWithIdentifier:@"View_Edit_VC"];
     editVC.taskToEdit = selectedTask;
     [self.navigationController pushViewController:editVC animated:YES];
 }
 
-
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [_doneDisplayArray removeObjectAtIndex:indexPath.row];
+        Todo *taskToDelete = self.isSearching ? self.filteredTodoArray[indexPath.row] : [self tasksForSection:indexPath.section][indexPath.row];
+        [self.doneDisplayArray removeObject:taskToDelete];
+        [self.filteredTodoArray removeObject:taskToDelete];
         
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         
-        //[self saveTask];
+        [self saveTasks];
     }
 }
-- (void)saveTask {
-    
+
+- (void)saveTasks {
     NSError *error;
-    NSData *archiveData = [NSKeyedArchiver archivedDataWithRootObject:_doneDisplayArray requiringSecureCoding:YES error:&error];
+    NSData *archiveData = [NSKeyedArchiver archivedDataWithRootObject:self.doneDisplayArray requiringSecureCoding:YES error:&error];
     if (error) {
         NSLog(@"Error archiving tasks: %@", error.localizedDescription);
         return;
     }
     
-    [_defaults setObject:archiveData forKey:@"tasks"];
-    [_defaults synchronize];
-    
+    [self.defaults setObject:archiveData forKey:@"tasks"];
+    [self.defaults synchronize];
 }
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
-    if (searchText.length == 0) {
-        _isSearching = NO;
-    } else {
-        _isSearching = YES;
-        [self filterTasksForSearchText:searchText];
-    }
+    self.isSearching = searchText.length > 0;
+    [self filterTasksForSearchText:searchText];
     [self updateTableViewVisibility];
 }
 
 - (void)filterTasksForSearchText:(NSString *)searchText {
-    [_filteredTodoArray removeAllObjects];
+    [self.filteredTodoArray removeAllObjects];
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name CONTAINS[cd] %@", searchText];
-    NSArray<Todo*> *filtered = [_doneDisplayArray filteredArrayUsingPredicate:predicate];
-    [_filteredTodoArray addObjectsFromArray:filtered];
+    NSArray<Todo*> *filtered = [self.doneDisplayArray filteredArrayUsingPredicate:predicate];
+    [self.filteredTodoArray addObjectsFromArray:filtered];
 }
+
 @end

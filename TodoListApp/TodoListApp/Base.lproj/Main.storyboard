@@ -15,14 +15,11 @@
                     <tabBarItem key="tabBarItem" title="Item" id="iFr-8z-KpL"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="OO2-fD-XI8">
-                        <rightBarButtonItems>
-                            <barButtonItem image="line.3.horizontal.decrease.circle.fill" catalog="system" id="MN9-db-Ftx"/>
-                            <barButtonItem systemItem="add" id="HKw-Rf-vfx">
-                                <connections>
-                                    <action selector="addButtonClicked:" destination="9RE-KN-vV6" id="iJW-wF-ch0"/>
-                                </connections>
-                            </barButtonItem>
-                        </rightBarButtonItems>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="HKw-Rf-vfx">
+                            <connections>
+                                <action selector="addButtonClicked:" destination="9RE-KN-vV6" id="iJW-wF-ch0"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="thV-YO-Eng">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
@@ -155,8 +152,8 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Done" image="checkmark.seal.fill" catalog="system" id="mSv-Wh-OnL"/>
                     <connections>
+                        <outlet property="doneTableView" destination="Hee-hb-jxq" id="iJC-CQ-TsJ"/>
                         <outlet property="searchBar" destination="8VB-47-hAj" id="elf-PZ-lEi"/>
-                        <outlet property="tableView" destination="Hee-hb-jxq" id="xJn-Cp-T4s"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="S95-3l-xTN" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -333,7 +330,6 @@
     <resources>
         <image name="checkmark.seal.fill" catalog="system" width="128" height="124"/>
         <image name="images3" width="225" height="225"/>
-        <image name="line.3.horizontal.decrease.circle.fill" catalog="system" width="128" height="123"/>
         <image name="note.text.badge.plus" catalog="system" width="128" height="109"/>
         <image name="nothing" width="626" height="626"/>
         <image name="pencil.and.list.clipboard" catalog="system" width="114" height="128"/>
